@@ -1,4 +1,5 @@
-
+# Opens a dialog from which the user selects a file, filename is stripped of spaces
+# and underscores are put in their place before it is uploaded to server and printed
 selectedFile="$(osascript -l JavaScript -e 'a=Application.currentApplication();a.includeStandardAdditions=true; a.chooseFile({withPrompt:"Choose a file to print:"}).toString()')"
 selectedFileBasename=$(basename "${selectedFile}")
 new_basename=`echo "$selectedFileBasename" | tr -d '[:blank:]'`
@@ -15,6 +16,10 @@ function delete_file() {
   ssh -q afenton@stargate "rm ~/Downloads/$new_basename" 2> /dev/null
 }
 
+if [ -z "$selectedFile" ]; then
+                echo "No file selected. Printing canceled."
+                exit
+fi
 
 send_file
 echo "File sent to server..."
